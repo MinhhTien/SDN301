@@ -8,7 +8,7 @@ import CategoryModel, { ICategory } from '@models/category.model'
 import { get } from 'lodash'
 
 export class OrchidController {
-  async renderAllOrchids(req: Request, res: Response, next: NextFunction) {
+  async renderAllOrchids(req: any, res: Response, next: NextFunction) {
     try {
       const orchids = await OrchidModel.find(
         {},
@@ -17,16 +17,20 @@ export class OrchidController {
           populate: 'category'
         }
       ).lean()
+      const user = req.session.user
       res.render('./orchids/all', {
         orchids,
-        search: 'Search Orchids...'
+        search: 'Search Orchids...',
+        isLoggedIn: !!user
       })
     } catch (err: any) {
-      res.render('404')
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
     }
   }
 
-  async searchOrchids(req: Request, res: Response, next: NextFunction) {
+  async searchOrchids(req: any, res: Response, next: NextFunction) {
     try {
       console.log(req.body)
       const orchids = await OrchidModel.find(
@@ -40,14 +44,17 @@ export class OrchidController {
       ).lean()
       res.render('./orchids/all', {
         orchids,
-        search: req.body.search
+        search: req.body.search,
+        isLoggedIn: !!req.session.user
       })
     } catch (err: any) {
-      res.render('404')
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
     }
   }
 
-  async renderManagementOrchids(req: Request, res: Response, next: NextFunction) {
+  async renderManagementOrchids(req: any, res: Response, next: NextFunction) {
     try {
       const categories = await CategoryModel.find({}).lean()
       let orchids = await OrchidModel.find(
@@ -63,14 +70,17 @@ export class OrchidController {
       })
       res.render('./orchids/management', {
         orchids,
-        categories
+        categories,
+        isLoggedIn: !!req.session.user
       })
     } catch (err: any) {
-      res.render('404')
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
     }
   }
 
-  async getOrchidById(req: Request, res: Response) {
+  async getOrchidById(req: any, res: Response) {
     try {
       const orchid = await OrchidModel.findOne(
         { slug: req.params?.orchidSlug },
@@ -80,7 +90,9 @@ export class OrchidController {
         }
       )
       if (!orchid) {
-        res.render('404')
+        res.render('404', {
+          isLoggedIn: !!req.session.user
+        })
         return
       }
       res.render('./orchids/detail', {
@@ -91,15 +103,18 @@ export class OrchidController {
         isNatural: orchid.isNatural,
         color: orchid.color,
         slug: orchid.slug,
-        categoryName: get(orchid, 'category.name')
+        categoryName: get(orchid, 'category.name'),
+        isLoggedIn: !!req.session.user
       })
     } catch (err: any) {
       console.log(err)
-      res.render('404')
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
     }
   }
 
-  async createOrchid(req: Request, res: Response, next: NextFunction) {
+  async createOrchid(req: any, res: Response, next: NextFunction) {
     try {
       const orchid = req.body
       const colorList = convertStringToColorArray(orchid.color)
@@ -108,7 +123,8 @@ export class OrchidController {
       const category = await CategoryModel.findById(orchid.categoryId)
       if (category === null) {
         return res.render('400', {
-          errorMessage: `Category not existed. Please try again!`
+          errorMessage: `Category not existed. Please try again!`,
+          isLoggedIn: !!req.session.user
         })
       }
 
@@ -129,16 +145,19 @@ export class OrchidController {
         const { code, keyPattern, keyValue } = err
         if (code === 11000 && keyPattern['name'] === 1) {
           res.render('400', {
-            errorMessage: `Orchid name : ${keyValue['name']} has existed. Please try another name!`
+            errorMessage: `Orchid name : ${keyValue['name']} has existed. Please try another name!`,
+            isLoggedIn: !!req.session.user
           })
         }
       }
       console.error(err)
-      res.render('404')
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
     }
   }
 
-  async updateOrchid(req: Request, res: Response, next: NextFunction) {
+  async updateOrchid(req: any, res: Response, next: NextFunction) {
     try {
       const form = formidable({})
       form.parse(req, async (err, fields: Fields) => {
@@ -150,7 +169,8 @@ export class OrchidController {
         const category = await CategoryModel.findById(fields.categoryId![0])
         if (category === null) {
           return res.render('400', {
-            errorMessage: `Category not existed. Please try again!`
+            errorMessage: `Category not existed. Please try again!`,
+            isLoggedIn: !!req.session.user
           })
         }
 
@@ -167,11 +187,14 @@ export class OrchidController {
         const orchid = await OrchidModel.findByIdAndUpdate(req.params.id, newOrchid).lean().exec()
 
         if (!orchid) {
-          res.status(httpStatus.NOT_FOUND).render('404')
+          res.status(httpStatus.NOT_FOUND).render('404', {
+            isLoggedIn: !!req.session.user
+          })
         } else {
           const orchids = await OrchidModel.find({}).lean()
           res.status(httpStatus.OK).render('./orchids/management', {
-            orchids
+            orchids,
+            isLoggedIn: !!req.session.user
           })
         }
       })
@@ -180,23 +203,30 @@ export class OrchidController {
         const { code, keyPattern, keyValue } = err
         if (code === 11000 && keyPattern['name'] === 1) {
           res.render('400', {
-            errorMessage: `Orchid name : ${keyValue['name']} has existed. Please try another name!`
+            errorMessage: `Orchid name : ${keyValue['name']} has existed. Please try another name!`,
+            isLoggedIn: !!req.session.user
           })
         }
       }
       console.error(err)
-      res.render('404')
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
     }
   }
 
-  async deleteOrchid(req: Request, res: Response) {
+  async deleteOrchid(req: any, res: Response) {
     try {
       const orchid = await OrchidModel.findByIdAndDelete(req.params.id).lean().exec()
       if (!orchid) {
-        res.status(httpStatus.NOT_FOUND).render('404')
+        res.status(httpStatus.NOT_FOUND).render('404', {
+          isLoggedIn: !!req.session.user
+        })
       }
     } catch (err: any) {
-      res.render('404')
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
     }
   }
 }

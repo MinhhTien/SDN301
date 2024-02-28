@@ -5,68 +5,76 @@ import bcrypt from 'bcryptjs'
 import { comparePassword, hashPassword } from '@utils/common'
 
 export class UserController {
-  renderLogin(req: Request, res: Response) {
+  renderLogin(req: any, res: Response) {
     try {
-      res.render('./auth/login', { layout: false })
+      res.render('./auth/login', { layout: false, isLoggedIn: !!req.session.user })
     } catch (err: any) {
-      res.render('404')
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
     }
   }
 
-  renderSignup(req: Request, res: Response, next: NextFunction) {
+  renderSignup(req: any, res: Response, next: NextFunction) {
     try {
-      res.render('./auth/signup', { layout: false })
+      res.render('./auth/signup', { layout: false, isLoggedIn: !!req.session.user })
     } catch (err: any) {
-      res.render('404')
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
     }
   }
 
-  async login(req: Request, res: Response) {
+  async login(req: any, res: Response) {
     try {
-      console.log(req.body)
-      const username = req.body.username
-      const password = req.body.password
+      const { username, password } = req.body
       const user = await UserModel.findOne(
         {
           username
         },
-        { password: 1 }
+        '+password'
       ).lean()
       if (!user) {
         return res.render('400', {
-          errorMessage: `Username or password is incorrect! Please try again.`
+          errorMessage: `Username or password is incorrect! Please try again.`,
+          isLoggedIn: !!req.session.user
         })
       }
       const isPasswordMatch = await comparePassword(password, user.password)
       if (!isPasswordMatch) {
         return res.render('400', {
-          errorMessage: `Username or password is incorrect! Please try again.`
+          errorMessage: `Username or password is incorrect! Please try again.`,
+          isLoggedIn: !!req.session.user
         })
       }
 
+      user.password = ''
+      req.session.user = user
       if (user.role === UserRole.ADMIN) {
         return res.redirect('/orchids/management')
       }
       if (user.role === UserRole.MEMBER) {
-        return res.redirect('/orchids/all')
+        return res.redirect('/orchids')
       }
 
       return res.redirect('/')
     } catch (err: any) {
       console.error(err)
-      res.render('404')
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
     }
   }
 
-  async signup(req: Request, res: Response, next: NextFunction) {
+  async signup(req: any, res: Response, next: NextFunction) {
     try {
-      console.log(req.body)
       const username = req.body.username
       const password = req.body.password
       const confirmPassword = req.body.confirmPassword
       if (password !== confirmPassword) {
         return res.render('400', {
-          errorMessage: `Confirm password not match! Please try again.`
+          errorMessage: `Confirm password not match! Please try again.`,
+          isLoggedIn: !!req.session.user
         })
       }
       const user = await UserModel.findOne(
@@ -77,7 +85,8 @@ export class UserController {
       ).lean()
       if (user) {
         return res.render('400', {
-          errorMessage: `Username ${username} has existed! Please try another username.`
+          errorMessage: `Username ${username} has existed! Please try another username.`,
+          isLoggedIn: !!req.session.user
         })
       }
 
@@ -91,17 +100,37 @@ export class UserController {
       return res.redirect('/login')
     } catch (err: any) {
       console.error(err)
-      res.render('404')
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
     }
   }
 
-  async _hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt()
-    const hash = await bcrypt.hash(password, salt)
-    return hash
+  async logout(req: Request, res: Response, next: NextFunction) {
+    req.session.destroy(() => {
+      console.log('User logged out')
+    })
+    res.redirect('/')
   }
 
-  _comparePassword(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash)
+  async renderAllAccounts(req: any, res: Response, next: NextFunction) {
+    try {
+      const users = await UserModel.find(
+        {
+          role: {
+            $ne: UserRole.ADMIN
+          }
+        },
+        '-password'
+      ).lean()
+      res.render('./users/management', {
+        users,
+        isLoggedIn: !!req.session.user
+      })
+    } catch (err: any) {
+      res.render('404', {
+        isLoggedIn: !!req.session.user
+      })
+    }
   }
 }

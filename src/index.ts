@@ -5,6 +5,9 @@ import morgan from 'morgan'
 import cors from 'cors'
 import { engine } from 'express-handlebars'
 import * as bodyParser from 'body-parser'
+import session from 'express-session'
+import cookieParser from 'cookie-parser'
+import moment from 'moment'
 
 import connectDB from '@utils/connect-db'
 import orchidRouter from '@routes/orchid.router'
@@ -29,6 +32,15 @@ app.use(
   })
 )
 app.use(bodyParser.json())
+app.use(cookieParser())
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'asdhbv618fbv7yfdf',
+    resave: true,
+    saveUninitialized: true,
+    cookie: { maxAge: 60000 }
+  })
+)
 if (env === 'development') {
   app.use(morgan('dev'))
 }
@@ -44,7 +56,15 @@ app.engine(
   'hbs',
   engine({
     defaultLayout: 'main',
-    extname: '.hbs'
+    extname: '.hbs',
+    helpers: {
+      inc: function (value: any, options: any) {
+        return parseInt(value) + 1
+      },
+      prettifyDate: function (timestamp: any) {
+        return moment(timestamp).format('YYYY-MM-DD HH:MM')
+      }
+    }
   })
 )
 
@@ -55,11 +75,15 @@ app.use('/categories', categoryRouter)
 
 const orchidController = new OrchidController()
 app.get('/', orchidController.renderAllOrchids)
-app.get('/home', (req, res) => {
-  res.render('home')
+app.get('/home', (req: any, res) => {
+  res.render('home', {
+    isLoggedIn: !!req.session.user
+  })
 })
-app.get('*', (req: Request, res: Response) => {
-  res.render('404')
+app.get('*', (req: any, res: Response) => {
+  res.render('404', {
+    isLoggedIn: !!req.session.user
+  })
 })
 
 app.listen(port, () => {
