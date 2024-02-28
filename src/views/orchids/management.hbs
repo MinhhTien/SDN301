@@ -1,0 +1,277 @@
+<!-- ====== Modal Section End -->
+<section class='bg-white pt-30 lg:pt-[60px]'>
+  <!-- ====== Modal Section Start -->
+  <section x-data='{createModalOpen: false}' class="pt-10">
+    <div class='container pt-20 pb-10 mx-auto flex justify-end'>
+      <button @click='createModalOpen = true'
+        class='px-8 py-4 text-lg font-medium text-center text-white bg-indigo-600 rounded-md'>
+        + New Orchid
+      </button>
+    </div>
+    <div x-show='createModalOpen' x-transition
+      class='fixed top-0 left-0 flex items-center justify-center w-full h-full min-h-screen px-4 py-5 bg-dark/90'>
+      <div @click.outside='createModalOpen = false'
+        class='w-full max-w-[570px] rounded-[20px] bg-white  py-12 px-8 text-center md:py-[60px] md:px-[70px]'>
+        <h3 class='pb-[18px] text-xl font-semibold text-dark  sm:text-2xl'>
+          Create orchid
+        </h3>
+        <br />
+        <form id='create' x-init method='post' action='/orchids'>
+          <div class='mb-6'>
+            <input type='text' placeholder='Name' required name='name'
+              class='border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none' />
+          </div>
+          <div class='mb-6'>
+            <input type='url' placeholder='Image' required name='image'
+              class='border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none' />
+          </div>
+          <div class='mb-6'>
+            <input type='number' placeholder='Price' required name='price'
+              class='border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none' />
+          </div>
+          <div class='mb-6'>
+            <select name="categoryId" required
+              class="border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none">
+              <option value="" selected>Choose a category</option>
+              {{#each categories}}
+              <option value="{{this._id}}">{{this.name}}</option>
+              {{/each}}
+            </select>
+          </div>
+          <div class='mb-6'>
+            <input type='text' placeholder='Original' required name='original'
+              class='border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none' />
+          </div>
+          <div class='mb-6'>
+            <label for='checkboxIsNaturalCreate' class='flex items-center cursor-pointer select-none text-dark'>
+              <div class='relative'>
+                <input name='isNatural' type='checkbox' id='checkboxIsNaturalCreate' class='sr-only' />
+                <div class='flex items-center justify-center w-5 h-5 mr-4 border border-stroke rounded box'>
+                  <span class='opacity-0'>
+                    <svg width='11' height='8' viewBox='0 0 11 8' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                      <path
+                        d='M10.0915 0.951972L10.0867 0.946075L10.0813 0.940568C9.90076 0.753564 9.61034 0.753146 9.42927 0.939309L4.16201 6.22962L1.58507 3.63469C1.40401 3.44841 1.11351 3.44879 0.932892 3.63584C0.755703 3.81933 0.755703 4.10875 0.932892 4.29224L0.932878 4.29225L0.934851 4.29424L3.58046 6.95832C3.73676 7.11955 3.94983 7.2 4.1473 7.2C4.36196 7.2 4.55963 7.11773 4.71406 6.9584L10.0468 1.60234C10.2436 1.4199 10.2421 1.1339 10.0915 0.951972ZM4.2327 6.30081L4.2317 6.2998C4.23206 6.30015 4.23237 6.30049 4.23269 6.30082L4.2327 6.30081Z'
+                        fill='#3056D3' stroke='#3056D3' stroke-width='0.4' />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+              Is natural?
+            </label>
+          </div>
+          <div class='mb-6'>
+            <input type='text' placeholder='Color' name='color' required
+              class='border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none' />
+          </div>
+          <div class='flex flex-wrap -mx-3'>
+            <div class='w-1/2 px-3'>
+              <div @click='createModalOpen = false'
+                class='cursor-pointer block w-full p-3 text-base font-medium text-center transition border rounded-md border-stroke text-dark  hover:border-red-600 hover:bg-red-600 hover:text-white'>
+                Cancel
+              </div>
+            </div>
+            <div class='w-1/2 px-3'>
+              <button type='submit'
+                class='block w-full p-3 text-base font-medium text-center text-white transition border rounded-md border-primary bg-indigo-600 hover:bg-blue-dark'>
+                Create
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+  <!-- ====== Modal Section End -->
+  <div class='container mx-auto'>
+    <div class='flex flex-wrap -mx-4'>
+      <div class='w-full px-4'>
+        <div class='max-w-full overflow-x-auto'>
+          <table class='w-full table-auto'>
+            <thead>
+              <tr class='text-center bg-indigo-400'>
+                <th
+                  class='w-1/6 min-w-[160px] border-l border-transparent py-4 px-3 text-lg font-medium text-white lg:py-7 lg:px-4'>
+                  Name
+                </th>
+                <th class='w-1/6 min-w-[160px] py-4 px-3 text-lg font-medium text-white lg:py-7 lg:px-4'>
+                  Image
+                </th>
+                <th class='w-1/6 min-w-[160px] py-4 px-3 text-lg font-medium text-white lg:py-7 lg:px-4'>
+                  Price
+                </th>
+                <th class='w-1/6 min-w-[160px] py-4 px-3 text-lg font-medium text-white lg:py-7 lg:px-4'>
+                  Category
+                </th>
+                <th class='w-1/6 min-w-[160px] py-4 px-3 text-lg font-medium text-white lg:py-7 lg:px-4'>
+                  Original
+                </th>
+                <th class='w-1/6 min-w-[160px] py-4 px-3 text-lg font-medium text-white lg:py-7 lg:px-4'>
+                  Color
+                </th>
+                <th class='w-1/6 min-w-[80px] py-1 px-1 text-lg font-medium text-white lg:py-1 lg:px-1'>
+                  Is natural
+                </th>
+                <th
+                  class='w-1/6 min-w-[260px] border-r border-transparent py-4 px-3 text-lg font-medium text-white lg:py-7 lg:px-4'>
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody x-init id='orchids'>
+              {{#each orchids}}
+              <tr>
+                <td
+                  class='text-dark border-b border-l border-[#E8E8E8] bg-white py-5 px-5 text-left text-base font-medium'>
+                  {{this.name}}
+                </td>
+                <td class='py-2'>
+                  <img src={{this.image}} alt='image' class='w-full' />
+                </td>
+                <td class='text-dark border-b border-[#E8E8E8] bg-white py-5 px-5 text-right text-base font-medium'>
+                  {{this.price}}$
+                </td>
+                <td class='text-dark border-b border-[#E8E8E8] bg-white py-5 px-5 text-left text-base font-medium'>
+                  {{this.category.name}}
+                </td>
+                <td class='text-dark border-b border-[#E8E8E8] bg-white py-5 px-5 text-left text-base font-medium'>
+                  {{this.original}}
+                </td>
+                <td class='text-dark border-b border-[#E8E8E8] bg-white py-5 px-2 text-center text-base font-medium'>
+                  {{#each this.color}}
+                  <button style='background-color: {{this}};'
+                    class='cursor-default w-6 h-6 border-2 border-gray-700 mr-2'></button>
+                  {{/each}}
+                </td>
+                <td class='text-dark border-b border-[#E8E8E8] bg-white py-5 px-2'>
+                  <div class='flex items-center justify-center'>
+                    <input id="inline-checkbox" type="checkbox" {{#if this.isNatural}}checked{{/if}}
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  </div>
+                </td>
+                <td class='text-dark bg-white h-40 px-2 flex justify-center items-center'>
+                  <section class='w-fit' x-data='{update{{this._id}}modalOpen: false}'>
+                    <a @click='update{{this._id}}modalOpen = true'
+                      class='cursor-pointer inline-block px-4 py-2.5 mr-2 border rounded-md hover:text-dark hover:bg-gray-100 font-medium'>
+                      Update
+                    </a>
+                    <div x-show='update{{this._id}}modalOpen' x-transition
+                      class='fixed top-0 left-0 flex items-center justify-center w-full h-full min-h-screen px-4 py-5 bg-dark/90'>
+                      <div @click.outside='update{{this._id}}modalOpen = false'
+                        class='w-full max-w-[570px] rounded-[20px] bg-white py-12 px-8 text-center md:py-[60px] md:px-[70px]'>
+                        <h3 class='pb-[18px] text-xl font-semibold text-dark sm:text-2xl'>
+                          Update Orchid
+                        </h3>
+                        <br />
+                        <form id='orchid' x-target method='put' action='/orchids/{{this._id}}'>
+                          <div class='mb-6'>
+                            <input id='name' type='text' placeholder='Name' value='{{this.name}}' name='name' required
+                              class='border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none' />
+                          </div>
+                          <div class='mb-6'>
+                            <input type='url' placeholder='Image' value='{{this.image}}' name='image' required
+                              class='border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none' />
+                          </div>
+                          <div class='mb-6'>
+                            <input type='number' placeholder='Price' value='{{this.price}}' name='price' required
+                              class='border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none' />
+                          </div>
+                          <div class='mb-6'>
+                            <select name="categoryId" required
+                              class="border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none">
+                              {{#each categories}}
+                              <option value="{{this._id}}">{{this.name}}</option>
+                              {{/each}}
+                            </select>
+                          </div>
+                          <div class='mb-6'>
+                            <input type='text' placeholder='Original' value='{{this.original}}' name='original' required
+                              class='border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none' />
+                          </div>
+                          <div class='mb-6'>
+                            <label for='checkboxIsNatural{{this._id}}Update'
+                              class='flex items-center cursor-pointer select-none text-dark'>
+                              <div class='relative'>
+                                <input type='checkbox' id='checkboxIsNatural{{this._id}}Update' name='isNatural'
+                                  class='sr-only' disabled {{#if this.isNatural}}checked{{/if}} />
+                                <div
+                                  class='flex items-center justify-center w-5 h-5 mr-4 border border-stroke rounded box'>
+                                  <span class='opacity-0'>
+                                    <svg width='11' height='8' viewBox='0 0 11 8' fill='none'
+                                      xmlns='http://www.w3.org/2000/svg'>
+                                      <path
+                                        d='M10.0915 0.951972L10.0867 0.946075L10.0813 0.940568C9.90076 0.753564 9.61034 0.753146 9.42927 0.939309L4.16201 6.22962L1.58507 3.63469C1.40401 3.44841 1.11351 3.44879 0.932892 3.63584C0.755703 3.81933 0.755703 4.10875 0.932892 4.29224L0.932878 4.29225L0.934851 4.29424L3.58046 6.95832C3.73676 7.11955 3.94983 7.2 4.1473 7.2C4.36196 7.2 4.55963 7.11773 4.71406 6.9584L10.0468 1.60234C10.2436 1.4199 10.2421 1.1339 10.0915 0.951972ZM4.2327 6.30081L4.2317 6.2998C4.23206 6.30015 4.23237 6.30049 4.23269 6.30082L4.2327 6.30081Z'
+                                        fill='#3056D3' stroke='#3056D3' stroke-width='0.4' />
+                                    </svg>
+                                  </span>
+                                </div>
+                              </div>
+                              Is Natural
+                            </label>
+                          </div>
+                          <div class='mb-6'>
+                            <input type='text' placeholder='Color' value='{{this.color}}' name='color' required
+                              class='border-stroke text-body-color focus:border-primary w-full rounded border py-3 px-[14px] text-base outline-none' />
+                          </div>
+                          <div class='flex flex-wrap -mx-3'>
+                            <div class='w-1/2 px-3'>
+                              <div @click='update{{this._id}}modalOpen = false'
+                                class='cursor-pointer block w-full p-3 text-base font-medium text-center transition border rounded-md border-stroke text-dark hover:border-red-600 hover:bg-red-600 hover:text-white'>
+                                Cancel
+                              </div>
+                            </div>
+                            <div class='w-1/2 px-3'>
+                              <button type='submit'
+                                @click.submit='update{{this._id}}modalOpen = false; location.reload()'
+                                class='block w-full p-3 text-base font-medium text-center text-white transition border rounded-md border-primary bg-indigo-600 hover:bg-blue-dark'>
+                                Update
+                              </button>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </section>
+                  <section class='w-fit' x-data='{deleteModalOpen{{this._id}}: false}'>
+                    <a @click='deleteModalOpen{{this._id}} = true'
+                      class='cursor-pointer inline-block px-4 py-2.5 mr-2 border rounded-md border-danger-500 text-danger-500 hover:bg-danger-500 hover:text-white font-medium'>
+                      Delete
+                    </a>
+                    <div x-show='deleteModalOpen{{this._id}}' x-transition
+                      class='fixed top-0 left-0 flex items-center justify-center w-full h-full min-h-screen px-4 py-5 bg-dark/90'>
+                      <div @click.outside='delete{{this._id}}modalOpen = false'
+                        class='w-full max-w-[570px] rounded-[20px] bg-white  py-12 px-8 text-center md:py-[60px] md:px-[70px]'>
+                        <h3
+                          class='pb-[18px] text-xl font-semibold text-dark  sm:text-2xl mb-4 text-gray-500 dark:text-gray-300'>
+                          Are you sure you want to delete this item?
+                        </h3>
+                        <br />
+                        <div class='flex flex-wrap -mx-3'>
+                          <div class='w-1/2 px-3'>
+                            <button @click='deleteModalOpen{{this._id}} = false'
+                              class='cursor-pointer block w-full p-3 text-base font-medium text-center transition border-stroke text-dark hover:border-red-600 hover:bg-red-600 hover:text-white'>
+                              No, cancel
+                            </button>
+                          </div>
+                          <div class='w-1/2 px-3'>
+                            <form method='delete' id='delete' action='/orchids/{{ this._id }}' x-target='orchid'>
+                              <button @click='location.reload()'
+                                class='block w-full p-3 text-base font-medium text-center text-white transition border rounded-md border-primary text-dark bg-indigo-600 hover:bg-blue-dark'>
+                                Yes, I'm sure
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
