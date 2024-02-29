@@ -63,11 +63,11 @@ app.engine(
         return parseInt(value) + 1
       },
       prettifyDate: function (timestamp: any) {
-        return moment(timestamp).format('YYYY-MM-DD HH:MM')
+        return moment(timestamp, 'YYYY-MM-DDTHH:mm:ss.SSS').format('YYYY-MM-DD HH:mm')
       },
       commentDate: function (timestamp: any) {
         console.log(timestamp, moment(timestamp).format('MMM. Do YYYY HH:MM'))
-        return moment(timestamp).format('MMM. Do YYYY HH:MM')
+        return moment(timestamp, 'YYYY-MM-DDTHH:mm:ss.SSS').format('MMM. Do YYYY HH:mm')
       },
       ifEquals: function (arg1: any, arg2: any, options: any) {
         return arg1 == arg2 ? options.fn(this) : options.inverse(this)
