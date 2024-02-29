@@ -66,10 +66,10 @@ app.engine(
         return moment(timestamp).format('YYYY-MM-DD HH:MM')
       },
       commentDate: function (timestamp: any) {
+        console.log(timestamp, moment(timestamp).format('MMM. Do YYYY HH:MM'))
         return moment(timestamp).format('MMM. Do YYYY HH:MM')
       },
       ifEquals: function (arg1: any, arg2: any, options: any) {
-        console.log(arg1, arg2)
         return arg1 == arg2 ? options.fn(this) : options.inverse(this)
       }
     }

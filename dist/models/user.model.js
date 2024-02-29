@@ -4,6 +4,7 @@ const constant_1 = require("../common/constant");
 const mongoose_1 = require("mongoose");
 const userSchema = new mongoose_1.Schema({
     username: { type: String, required: true },
+    avatar: { type: String, required: false },
     password: { type: String, required: true, select: false },
     role: { type: String, enum: constant_1.UserRole, default: constant_1.UserRole.MEMBER }
 }, {
