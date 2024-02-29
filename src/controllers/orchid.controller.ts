@@ -6,6 +6,8 @@ import { createSlug, convertStringToColorArray } from '@utils/common'
 import { MongoServerError } from 'mongodb'
 import CategoryModel, { ICategory } from '@models/category.model'
 import { get } from 'lodash'
+import CommentModel from '@models/comment.model'
+import { UserRole } from '@common/constant'
 
 export class OrchidController {
   async renderAllOrchids(req: any, res: Response, next: NextFunction) {
@@ -21,11 +23,13 @@ export class OrchidController {
       res.render('./orchids/all', {
         orchids,
         search: 'Search Orchids...',
-        isLoggedIn: !!user
+        isLoggedIn: !!user,
+        user: req.session.user
       })
     } catch (err: any) {
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }
@@ -45,11 +49,13 @@ export class OrchidController {
       res.render('./orchids/all', {
         orchids,
         search: req.body.search,
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     } catch (err: any) {
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }
@@ -71,11 +77,13 @@ export class OrchidController {
       res.render('./orchids/management', {
         orchids,
         categories,
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     } catch (err: any) {
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }
@@ -86,16 +94,22 @@ export class OrchidController {
         { slug: req.params?.orchidSlug },
         {},
         {
-          populate: 'category'
+          populate: ['category', 'comments.author']
         }
       )
+      const comment = await CommentModel.findOne({
+        orchid: orchid?._id,
+        author: req.session.user?._id
+      })
       if (!orchid) {
         res.render('404', {
-          isLoggedIn: !!req.session.user
+          isLoggedIn: !!req.session.user,
+          user: req.session.user
         })
         return
       }
       res.render('./orchids/detail', {
+        _id: orchid._id,
         name: orchid.name,
         price: orchid.price,
         image: orchid.image,
@@ -103,13 +117,18 @@ export class OrchidController {
         isNatural: orchid.isNatural,
         color: orchid.color,
         slug: orchid.slug,
+        comments: orchid.comments?.map((comment: any) => comment.toJSON()),
+        commentCount: orchid.comments?.length,
         categoryName: get(orchid, 'category.name'),
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user,
+        canComment: req.session.user?.role === UserRole.MEMBER && !comment
       })
     } catch (err: any) {
       console.log(err)
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }
@@ -124,7 +143,8 @@ export class OrchidController {
       if (category === null) {
         return res.render('400', {
           errorMessage: `Category not existed. Please try again!`,
-          isLoggedIn: !!req.session.user
+          isLoggedIn: !!req.session.user,
+          user: req.session.user
         })
       }
 
@@ -146,13 +166,15 @@ export class OrchidController {
         if (code === 11000 && keyPattern['name'] === 1) {
           res.render('400', {
             errorMessage: `Orchid name : ${keyValue['name']} has existed. Please try another name!`,
-            isLoggedIn: !!req.session.user
+            isLoggedIn: !!req.session.user,
+            user: req.session.user
           })
         }
       }
       console.error(err)
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }
@@ -170,7 +192,8 @@ export class OrchidController {
         if (category === null) {
           return res.render('400', {
             errorMessage: `Category not existed. Please try again!`,
-            isLoggedIn: !!req.session.user
+            isLoggedIn: !!req.session.user,
+            user: req.session.user
           })
         }
 
@@ -188,13 +211,15 @@ export class OrchidController {
 
         if (!orchid) {
           res.status(httpStatus.NOT_FOUND).render('404', {
-            isLoggedIn: !!req.session.user
+            isLoggedIn: !!req.session.user,
+            user: req.session.user
           })
         } else {
           const orchids = await OrchidModel.find({}).lean()
           res.status(httpStatus.OK).render('./orchids/management', {
             orchids,
-            isLoggedIn: !!req.session.user
+            isLoggedIn: !!req.session.user,
+            user: req.session.user
           })
         }
       })
@@ -204,13 +229,15 @@ export class OrchidController {
         if (code === 11000 && keyPattern['name'] === 1) {
           res.render('400', {
             errorMessage: `Orchid name : ${keyValue['name']} has existed. Please try another name!`,
-            isLoggedIn: !!req.session.user
+            isLoggedIn: !!req.session.user,
+            user: req.session.user
           })
         }
       }
       console.error(err)
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }
@@ -220,12 +247,14 @@ export class OrchidController {
       const orchid = await OrchidModel.findByIdAndDelete(req.params.id).lean().exec()
       if (!orchid) {
         res.status(httpStatus.NOT_FOUND).render('404', {
-          isLoggedIn: !!req.session.user
+          isLoggedIn: !!req.session.user,
+          user: req.session.user
         })
       }
     } catch (err: any) {
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }

@@ -14,6 +14,7 @@ import orchidRouter from '@routes/orchid.router'
 import categoryRouter from '@routes/category.router'
 import { OrchidController } from '@controllers/orchid.controller'
 import userRouter from '@routes/user.router'
+import commentRouter from '@routes/comment.router'
 
 dotenv.config()
 const port = process.env.PORT
@@ -63,6 +64,13 @@ app.engine(
       },
       prettifyDate: function (timestamp: any) {
         return moment(timestamp).format('YYYY-MM-DD HH:MM')
+      },
+      commentDate: function (timestamp: any) {
+        return moment(timestamp).format('MMM. Do YYYY HH:MM')
+      },
+      ifEquals: function (arg1: any, arg2: any, options: any) {
+        console.log(arg1, arg2)
+        return arg1 == arg2 ? options.fn(this) : options.inverse(this)
       }
     }
   })
@@ -72,17 +80,20 @@ app.engine(
 app.use(userRouter)
 app.use('/orchids', orchidRouter)
 app.use('/categories', categoryRouter)
+app.use('/comments', commentRouter)
 
 const orchidController = new OrchidController()
 app.get('/', orchidController.renderAllOrchids)
 app.get('/home', (req: any, res) => {
   res.render('home', {
-    isLoggedIn: !!req.session.user
+    isLoggedIn: !!req.session.user,
+    user: req.session.user
   })
 })
 app.get('*', (req: any, res: Response) => {
   res.render('404', {
-    isLoggedIn: !!req.session.user
+    isLoggedIn: !!req.session.user,
+    user: req.session.user
   })
 })
 

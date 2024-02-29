@@ -10,7 +10,7 @@ userRouter.route('/login').get(AuthRoute, userController.renderLogin).post(userC
 
 userRouter.route('/signup').get(AuthRoute, userController.renderSignup).post(userController.signup)
 
-userRouter.route('/logout').get(AuthRoute, userController.logout)
+userRouter.route('/logout').get(Authorization([UserRole.ADMIN, UserRole.MEMBER]), userController.logout)
 
 userRouter.route('/accounts').get(Authorization([UserRole.ADMIN]), userController.renderAllAccounts)
 

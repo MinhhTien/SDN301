@@ -7,20 +7,22 @@ import { comparePassword, hashPassword } from '@utils/common'
 export class UserController {
   renderLogin(req: any, res: Response) {
     try {
-      res.render('./auth/login', { layout: false, isLoggedIn: !!req.session.user })
+      res.render('./auth/login', { layout: false, isLoggedIn: !!req.session.user, user: req.session.user })
     } catch (err: any) {
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }
 
   renderSignup(req: any, res: Response, next: NextFunction) {
     try {
-      res.render('./auth/signup', { layout: false, isLoggedIn: !!req.session.user })
+      res.render('./auth/signup', { layout: false, isLoggedIn: !!req.session.user, user: req.session.user })
     } catch (err: any) {
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }
@@ -37,14 +39,16 @@ export class UserController {
       if (!user) {
         return res.render('400', {
           errorMessage: `Username or password is incorrect! Please try again.`,
-          isLoggedIn: !!req.session.user
+          isLoggedIn: !!req.session.user,
+          user: req.session.user
         })
       }
       const isPasswordMatch = await comparePassword(password, user.password)
       if (!isPasswordMatch) {
         return res.render('400', {
           errorMessage: `Username or password is incorrect! Please try again.`,
-          isLoggedIn: !!req.session.user
+          isLoggedIn: !!req.session.user,
+          user: req.session.user
         })
       }
 
@@ -61,7 +65,8 @@ export class UserController {
     } catch (err: any) {
       console.error(err)
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }
@@ -74,7 +79,8 @@ export class UserController {
       if (password !== confirmPassword) {
         return res.render('400', {
           errorMessage: `Confirm password not match! Please try again.`,
-          isLoggedIn: !!req.session.user
+          isLoggedIn: !!req.session.user,
+          user: req.session.user
         })
       }
       const user = await UserModel.findOne(
@@ -86,7 +92,8 @@ export class UserController {
       if (user) {
         return res.render('400', {
           errorMessage: `Username ${username} has existed! Please try another username.`,
-          isLoggedIn: !!req.session.user
+          isLoggedIn: !!req.session.user,
+          user: req.session.user
         })
       }
 
@@ -101,7 +108,8 @@ export class UserController {
     } catch (err: any) {
       console.error(err)
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }
@@ -125,11 +133,13 @@ export class UserController {
       ).lean()
       res.render('./users/management', {
         users,
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     } catch (err: any) {
       res.render('404', {
-        isLoggedIn: !!req.session.user
+        isLoggedIn: !!req.session.user,
+        user: req.session.user
       })
     }
   }

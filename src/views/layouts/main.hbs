@@ -46,12 +46,14 @@
                     All Orchids
                   </a>
                 </li>
+                {{#ifEquals user.role "ADMIN"}}
                 <li className="mr-3 nav__item">
                   <a href='/orchids/management'
                     class='inline-block px-4 py-2 text-lg font-normal text-gray-800 no-underline rounded-md dark:text-gray-200 hover:text-indigo-500 focus:text-indigo-500 focus:bg-indigo-100 focus:outline-none dark:focus:bg-gray-800'>
                     Orchids Management
                   </a>
                 </li>
+                {{/ifEquals}}
               </ul>
             </nav>
           </div>
@@ -83,8 +85,7 @@
               class="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
               id="user-menu-button" aria-expanded="false" data-dropdown-toggle="dropdown">
               <span class="sr-only">Open user menu</span>
-              <img class="w-8 h-8 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                alt="user photo">
+              <img class="w-8 h-8 rounded-full" src="{{user.avatar}}" alt="user photo">
             </button>
             <a href='/logout'>
               <button type="button" data-dropdown-toggle="apps-dropdown"
